@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import Column, DateTime, ForeignKey, Table, Text, UniqueConstraint, func
+from sqlalchemy import Column, ForeignKey, Table, Text, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.core.database import Base
 
@@ -11,6 +11,7 @@ job_skills = Table(
     Column("skill_id", ForeignKey("skills.id", ondelete="CASCADE"), primary_key=True),
 )
 
+
 class Role(Base):
     __tablename__ = "roles"
 
@@ -19,6 +20,7 @@ class Role(Base):
     slug: Mapped[str] = mapped_column(unique=True)          # "backend-developer"
 
     jobs: Mapped[list["Job"]] = relationship(back_populates="role")
+
 
 class Skill(Base):
     __tablename__ = "skills"
@@ -31,16 +33,17 @@ class Skill(Base):
         secondary=job_skills, back_populates="skills"
     )
 
+
 class Job(Base):
-    __table__name = "jobs"
+    __tablename__ = "jobs"
     __table_args__ = (
         # Store the same job only once
         UniqueConstraint("source", "external_id", name="uq_job_source_external_id"),
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    source: Mapped[str]         # Source of the API e.g., "adzuna"
-    external_id: Mapped[str]    # Job's id in that API
+    source: Mapped[str]                                     # Source of API
+    external_id: Mapped[str]                                # the job's id in that API
     title: Mapped[str]
     company: Mapped[str | None]
     location: Mapped[str | None]
@@ -52,6 +55,6 @@ class Job(Base):
     role_id: Mapped[int | None] = mapped_column(ForeignKey("roles.id"))
     role: Mapped[Role | None] = relationship(back_populates="jobs")
 
-    skills = Mapped[list[Skill]] = relationship(
+    skills: Mapped[list[Skill]] = relationship(
         secondary=job_skills, back_populates="jobs"
     )
