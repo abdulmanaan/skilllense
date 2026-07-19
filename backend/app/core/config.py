@@ -4,6 +4,9 @@ class Settings(BaseSettings):
     """Load application settings from the .env file."""
 
     database_url: str
+    adzuna_app_id: str
+    adzuna_app_key: str
+
     model_config = SettingsConfigDict(env_file=".env")
 
 settings = Settings()
