@@ -3,6 +3,7 @@ from app.core.config import settings
 from app.core.database import async_session
 from app.services.job_fetcher import fetch_adzuna_jobs, fetch_remotive_jobs
 from app.services.job_store import store_jobs
+from app.services.job_analyzer import analyze_jobs, seed_roles_and_skills
 
 async def main() -> None:
     print("Fetching from Remotive...")
@@ -15,8 +16,11 @@ async def main() -> None:
 
     async with async_session() as session:
         new_count = await store_jobs(session, remotive + adzuna)
+        await seed_roles_and_skills(session)
+        analyzed = await analyze_jobs(session)
 
     print(f"Stored {new_count} new jobs.")
+    print(f"Analyzed {analyzed} jobs.")
 
 if __name__ == "__main__":
     asyncio.run(main())
