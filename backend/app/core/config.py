@@ -7,6 +7,11 @@ class Settings(BaseSettings):
     adzuna_app_id: str
     adzuna_app_key: str
 
-    model_config = SettingsConfigDict(env_file=".env")
+    github_client_id: str
+    github_client_secret: str
+    github_redirect_uri: str
+    jwt_secret: str
+
+    model_config = SettingsConfigDict(env_file=BACKEND_DIR / ".env")
 
 settings = Settings()
