@@ -1,6 +1,7 @@
 import httpx
 from pydantic import BaseModel, field_validator
 from datetime import datetime, timezone
+from app.services.analyzer import extract_skills
 
 class FetchedJob(BaseModel):
     """Convert fetched job's format into our specified format."""
@@ -84,3 +85,12 @@ async def fetch_adzuna_jobs(
                     )
                 )
     return jobs
+
+def filter_relevant_jobs(jobs: list[FetchedJob]) -> list[FetchedJob]:
+    """Keep only jobs where at least one known tech skill cna be detected."""
+    relevant = []
+    for job in jobs:
+        skills = extract_skills(job.title, job.description)
+        if skills:
+            relevant.append(job)
+    return relevant

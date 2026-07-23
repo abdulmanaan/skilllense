@@ -1,7 +1,7 @@
 import asyncio
 from app.core.config import settings
 from app.core.database import async_session
-from app.services.job_fetcher import fetch_adzuna_jobs, fetch_remotive_jobs
+from app.services.job_fetcher import fetch_adzuna_jobs, fetch_remotive_jobs, filter_relevant_jobs
 from app.services.job_store import store_jobs
 from app.services.job_analyzer import analyze_jobs, seed_roles_and_skills
 
@@ -13,6 +13,11 @@ async def main() -> None:
     print("Fetching from Adzuna...")
     adzuna = await fetch_adzuna_jobs(settings.adzuna_app_id, settings.adzuna_app_key)
     print(f"  got {len(adzuna)} jobs")
+
+    all_jobs = remotive + adzuna
+    relevant = filter_relevant_jobs(all_jobs)
+    print(f"Filtered: {len(relevant)} relevant / {len(all_jobs)} total "
+          f"({len(all_jobs) - len(relevant)} discarded as non-tech)")
 
     async with async_session() as session:
         new_count = await store_jobs(session, remotive + adzuna)
