@@ -58,3 +58,18 @@ class Job(Base):
     skills: Mapped[list[Skill]] = relationship(
         secondary=job_skills, back_populates="jobs"
     )
+
+class User(Base):
+    __tablename__ = "users"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    github_id: Mapped[int] = mapped_column(unique=True, index=True)
+    github_username: Mapped[str]
+    avatar_url: Mapped[str | None]
+    access_token: Mapped[str]
+    createt_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+    last_login_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )

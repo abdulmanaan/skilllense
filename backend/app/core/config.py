@@ -12,6 +12,6 @@ class Settings(BaseSettings):
     github_redirect_uri: str
     jwt_secret: str
 
-    model_config = SettingsConfigDict(env_file=BACKEND_DIR / ".env")
+    model_config = SettingsConfigDict(env_file=".env")
 
 settings = Settings()
