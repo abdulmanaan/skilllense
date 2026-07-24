@@ -1,26 +1,45 @@
 import secrets
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Cookie, HTTPException
 from fastapi.responses import RedirectResponse
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.core.deps import get_db
+from app.core.deps import get_db, get_current_user
 from app.core.security import create_access_token
 from app.models import User
 from app.services.github_oauth import build_authorize_url, exchange_code_for_token, fetch_github_profile
 
 router = APIRouter()
+
 FRONTEND_URL = "http://localhost:5173"
+STATE_COOKIE_NAME = "oauth_state"
 
 @router.get("/github/login")
 async def github_login():
-    """Send user to GitHub to authorize our app."""
+    """Send user to GitHub, remembering our 'state' in a cookie."""
     state = secrets.token_urlsafe(16)
     url = build_authorize_url(state)
-    return RedirectResponse(url)
+
+    response = RedirectResponse(url)
+    response.set_cookie(
+        key=STATE_COOKIE_NAME,
+        value=state,
+        max_age=600,
+        httponly=True,
+        samesite="lax",
+    )
+    return response
 
 @router.get("/github/callback")
-async def github_callback(code: str, db: AsyncSession = Depends(get_db)):
-    """Sends user back here with a temporary code."""
+async def github_callback(
+        code: str,
+        state: str,
+        db: AsyncSession = Depends(get_db),
+        oauth_state: str | None = Cookie(default=None),
+):
+    """Sends user back here, verify state, then log them in."""
+    if oauth_state is None or state != oauth_state:
+        raise HTTPException(status_code=400, detail="Invalid or missing OAuth state")
+
     access_token = await exchange_code_for_token(code)
     profile = await fetch_github_profile(access_token)
 
@@ -44,5 +63,15 @@ async def github_callback(code: str, db: AsyncSession = Depends(get_db)):
     await db.refresh(user)
 
     jwt_token = create_access_token(user.id)
-    return RedirectResponse(f"{FRONTEND_URL}/auth/callback?token={jwt_token}")
+    response = RedirectResponse(f"{FRONTEND_URL}/auth/callback?token={jwt_token}")
+    response.delete_cookie(STATE_COOKIE_NAME)
+    return response
 
+@router.get("/me")
+async def me(user: User = Depends(get_current_user)):
+    """Returns the currently logged-in user's basic info."""
+    return {
+        "id": user.id,
+        "github_username": user.github_username,
+        "avatar_url": user.avatar_url,
+    }
