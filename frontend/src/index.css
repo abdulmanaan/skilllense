@@ -1,1 +1,28 @@
 @import "tailwindcss";
+
+@theme {
+  --color-paper: #eff2ee;
+  --color-surface: #fafbf8;
+  --color-ink: #14181a;
+  --color-gold: #c08a2e;
+  --color-gold-soft: #e4c888;
+  --color-teal: #1e7a6c;
+  --color-mint: #4fd1be;
+  --color-slate: #5b625c;
+  --color-line: #dde2d9;
+
+  --font-display: "Fraunces", ui-serif, Georgia, serif;
+  --font-body: "Public Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
+}
+
+@layer base {
+  body {
+    @apply bg-paper text-ink font-body antialiased;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-gold);
+    outline-offset: 3px;
+  }
+}
