@@ -1,8 +1,9 @@
 import strawberry
 from sqlalchemy import func, select
-from app.api.graphql_types import JobType, RoleType, SkillType
+from app.api.graphql_types import JobType, RoleType, SkillType, SkillGapType
 from app.core.database import async_session
 from app.models import Job, Role, Skill, job_skills
+from app.services.github_repos import extract_user_skills
 
 async def _top_skills_for_role(role_id: int | None, limit: int = 10) -> list[SkillType]:
     """Return the top skills of a specified role."""
@@ -72,5 +73,28 @@ class Query:
             )
             for j in jobs
         ]
+
+    @strawberry.field
+    async def skill_gap(self, info: strawberry.Info, role: str) -> SkillGapType:
+        """Compares the logged-in user's GitHub skills against market
+        demand for one role."""
+        user = info.context.get("user")
+        if user is None:
+            raise Exception("Not authenticated")
+
+        async with async_session() as session:
+            result = await session.execute(select(Role.id).where(Role.slug == role))
+            role_id = result.scalar_one_or_none()
+        if role_id is None:
+            raise Exception(f"Unknown role: {role}")
+
+        market = await _top_skills_for_role(role_id, limit=25)
+        user_skills = await extract_user_skills(user.access_token)
+
+        have = [s for s in market if s.name in user_skills]
+        gap = [s for s in market if s.name not in user_skills]
+        extra = sorted(user_skills - {s.name for s in market})
+
+        return SkillGapType(have=have, gap=gap, extra=extra)
 
 schema = strawberry.Schema(query=Query)

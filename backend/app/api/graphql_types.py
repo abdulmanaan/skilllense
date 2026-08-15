@@ -21,3 +21,9 @@ class RoleType:
     name: str
     job_count: int
     top_skills: list[SkillType]
+
+@strawberry.type
+class SkillGapType:
+    have: list[SkillType]
+    gap: list[SkillType]
+    extra: list[str]

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { graphqlRequest } from "../lib/graphql";
 import RoleSelector from "../components/dashboard/RoleSelector";
 import SkillDemandList from "../components/dashboard/SkillDemandList";
+import GapAnalysis from "../components/dashboard/GapAnalysis";
 
 const ROLES_QUERY = `
   query Roles {
@@ -58,6 +59,7 @@ export default function DashboardPage() {
         <>
           <RoleSelector roles={roles} selectedSlug={selectedSlug} onSelect={setSelectedSlug} />
           {selectedRole && <SkillDemandList role={selectedRole} />}
+          {selectedRole && <GapAnalysis roleSlug={selectedRole.slug} />}
         </>
       )}
     </div>
