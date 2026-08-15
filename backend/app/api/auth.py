@@ -7,10 +7,10 @@ from app.core.deps import get_db, get_current_user
 from app.core.security import create_access_token
 from app.models import User
 from app.services.github_oauth import build_authorize_url, exchange_code_for_token, fetch_github_profile
+from app.core.config import settings
 
 router = APIRouter()
 
-FRONTEND_URL = "http://localhost:5173"
 STATE_COOKIE_NAME = "oauth_state"
 
 @router.get("/github/login")
@@ -63,7 +63,7 @@ async def github_callback(
     await db.refresh(user)
 
     jwt_token = create_access_token(user.id)
-    response = RedirectResponse(f"{FRONTEND_URL}/auth/callback?token={jwt_token}")
+    response = RedirectResponse(f"{settings.frontend_url}/auth/callback?token={jwt_token}")
     response.delete_cookie(STATE_COOKIE_NAME)
     return response
 
