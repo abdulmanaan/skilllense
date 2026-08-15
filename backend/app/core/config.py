@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     github_redirect_uri: str
     jwt_secret: str
     frontend_url: str = "http://localhost:5173"  # default for local dev
+    admin_api_key: str
 
     model_config = SettingsConfigDict(env_file=".env")
 

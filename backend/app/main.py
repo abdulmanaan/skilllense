@@ -6,6 +6,7 @@ from app.api.graphql_schema import schema
 from app.api.rest import router as rest_router
 from app.core.database import async_session
 from app.core.deps import get_user_by_token
+from app.api.admin import router as admin_router
 
 app = FastAPI(title="SkillLens API")
 
@@ -32,3 +33,4 @@ async def get_graphql_context(request: Request) -> dict:
 app.include_router(rest_router, prefix="/api")
 app.include_router(auth_router, prefix="/api/auth")
 app.include_router(GraphQLRouter(schema, context_getter=get_graphql_context), prefix="/graphql")
+app.include_router(admin_router, prefix="/api/admin")
