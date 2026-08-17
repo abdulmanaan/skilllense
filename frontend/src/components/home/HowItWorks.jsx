@@ -1,18 +1,25 @@
+import scanImage from "../../assets/how-it-works/scan.jpg";
+import focusImage from "../../assets/how-it-works/focus.jpg";
+import compareImage from "../../assets/how-it-works/compare.jpg";
+
 const steps = [
   {
     label: "Scan",
     title: "We read the market",
     body: "Every day, SkillLens pulls live software job postings from across the industry, not a curated sample, the real thing.",
+    image: scanImage,
   },
   {
     label: "Focus",
     title: "We extract real skills",
     body: "Each posting is parsed for named technologies and frameworks, then grouped by role: Backend, Frontend, Mobile, and more.",
+    image: focusImage,
   },
   {
     label: "Compare",
     title: "You see your gap",
-    body: "Connect GitHub and SkillLens lines your repositories up against market demand and show what you have, and what's worth learning next.",
+    body: "Connect GitHub and SkillLens lines your repositories up against market demand: what you have, and what's worth learning next.",
+    image: compareImage,
   },
 ];
 
@@ -24,16 +31,17 @@ export default function HowItWorks() {
           From noise to signal, in three passes.
         </h2>
 
-        <div className="relative mt-14 grid gap-10 md:grid-cols-3">
-          <div className="absolute inset-x-0 top-7 hidden h-px bg-line md:block" aria-hidden="true" />
-
+        <div className="mt-14 grid gap-10 sm:grid-cols-3">
           {steps.map((step) => (
-            <div key={step.label} className="relative">
-              <span className="relative z-10 inline-flex h-14 w-20 items-center justify-center rounded-full border border-gold bg-paper font-mono text-xs uppercase tracking-widest text-gold">
+            <div key={step.label}>
+              <div className="aspect-square w-full overflow-hidden rounded-2xl border border-line bg-paper">
+                <img src={step.image} alt={step.title} className="h-full w-full object-cover" />
+              </div>
+              <span className="mt-5 inline-block font-mono text-xs uppercase tracking-widest text-gold">
                 {step.label}
               </span>
-              <h3 className="mt-5 font-display text-xl text-ink">{step.title}</h3>
-              <p className="mt-2 max-w-xs text-sm leading-relaxed text-slate">{step.body}</p>
+              <h3 className="mt-1 font-display text-xl text-ink">{step.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-slate">{step.body}</p>
             </div>
           ))}
         </div>

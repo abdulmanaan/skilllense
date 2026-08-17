@@ -4,7 +4,7 @@ const variantStyles = {
 };
 
 const base =
-  "inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 " +
+  "inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 " +
   "font-body text-sm font-medium transition-colors duration-150 " +
   "disabled:opacity-50 disabled:pointer-events-none";
 
